@@ -11,18 +11,18 @@
 
 // #define function owner() view returns (address)
 // #define function setOwner(address) nonpayable returns (bool)
-#define function deposit() payable returns ()
+// #define function deposit() payable returns ()
 // #define function withdraw() nonpayable returns ()
 
-#define event Deposit(address,uint256)
+// #define event Deposit(address,uint256)
 // #define event Withdrawal(uint256)
 // #define event OwnerSet(address)
 
 // // -------------------------------------------------------------------------------------------------
 // // CONSTANTS
 
-#define constant OWNER_SLOT = FREE_STORAGE_POINTER()
-#define constant DEPOSIT_HASH = 0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c
+// #define constant OWNER_SLOT = FREE_STORAGE_POINTER()
+// #define constant DEPOSIT_HASH = 0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c
 // #define constant WITHDRAWAL_HASH = 0x4e70a604b23a8edee2b1d0a656e9b9c00b73ad8bb1afc2c59381ee9f69197de7
 // #define constant OWNERSET_HASH = 0x50146d0e3c60aa1d17a70635b05494f864e86144a2201275021014fbf08bafe2
 
@@ -109,25 +109,25 @@
 // Deposits tokens into the contract.
 // Since withdrawal is permissioned to the owner, there is no need to have accounting.
 // We log here for indexers.
-#define macro DEPOSIT() = takes (0) returns (0) {
-    callvalue       // [msg.value]
-    iszero          // [is_msg_value_zero]
-    iszero          // [is_msg_value_non_zero]
-    deposited       // [deposited_jumpdest, is_msg_value_non_zero]
-    jumpi           // []
-    0x00 0x00 revert
+// #define macro DEPOSIT() = takes (0) returns (0) {
+//     callvalue       // [msg.value]
+//     iszero          // [is_msg_value_zero]
+//     iszero          // [is_msg_value_non_zero]
+//     deposited       // [deposited_jumpdest, is_msg_value_non_zero]
+//     jumpi           // []
+//     0x00 0x00 revert
 
-    deposited:
-        callvalue       // [msg.value]
-        0x00            // [offset, msg.value]
-        mstore          // []
+//     deposited:
+//         callvalue       // [msg.value]
+//         0x00            // [offset, msg.value]
+//         mstore          // []
 
-        caller          // [topic1]
-        [DEPOSIT_HASH]  // [topic0, topic1]
-        0x20            // [size, topic0, topic1]
-        0x00            // [offset, size, topic0, topic1]
-        log2            // []
-}
+//         caller          // [topic1]
+//         [DEPOSIT_HASH]  // [topic0, topic1]
+//         0x20            // [size, topic0, topic1]
+//         0x00            // [offset, size, topic0, topic1]
+//         log2            // []
+// }
 
 // // Withdraws tokens from contract.
 // // Authentication is checked in the function selector switch.
@@ -178,20 +178,20 @@
 // // -------------------------------------------------------------------------------------------------
 // // CONSTRUCTOR
 
-#define macro CONSTRUCTOR() = takes (0) returns (0) {
-    caller          // [msg.sender]
-    [OWNER_SLOT]    // [owner_slot, msg.sender]
-    sstore          // []
-    // DEPOSIT()
-}
+// #define macro CONSTRUCTOR() = takes (0) returns (0) {
+//     // caller          // [msg.sender]
+//     // [OWNER_SLOT]    // [owner_slot, msg.sender]
+//     // sstore          // []
+//     // DEPOSIT()
+// }
 
 // // -------------------------------------------------------------------------------------------------
 // // ENTRY POINT
 
 #define macro MAIN() = takes (0) returns (0) {
-    0x09
-    0x00 mstore
-    0x20            // [size]
+    // 0x09
+    // 0x00 mstore
+    0x00            // [size]
     0x00            // [offset, size]
     return          // []
 
