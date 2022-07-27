@@ -9,234 +9,221 @@
 // -------------------------------------------------------------------------------------------------
 // ABI DEFINITION
 
-// #define function owner() view returns (address)
-// #define function setOwner(address) nonpayable returns (bool)
-// #define function deposit() payable returns ()
-// #define function withdraw() nonpayable returns ()
+#define function owner() view returns (address)
+#define function setOwner(address) nonpayable returns (bool)
+#define function deposit() payable returns ()
+#define function withdraw() nonpayable returns ()
 
-// #define event Deposit(address,uint256)
-// #define event Withdrawal(uint256)
-// #define event OwnerSet(address)
+#define event Deposit(address,uint256)
+#define event Withdrawal(uint256)
+#define event OwnerSet(address)
 
-// // -------------------------------------------------------------------------------------------------
-// // CONSTANTS
+// -------------------------------------------------------------------------------------------------
+// CONSTANTS
 
-// #define constant OWNER_SLOT = FREE_STORAGE_POINTER()
-// #define constant DEPOSIT_HASH = 0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c
-// #define constant WITHDRAWAL_HASH = 0x4e70a604b23a8edee2b1d0a656e9b9c00b73ad8bb1afc2c59381ee9f69197de7
-// #define constant OWNERSET_HASH = 0x50146d0e3c60aa1d17a70635b05494f864e86144a2201275021014fbf08bafe2
+#define constant OWNER_SLOT = FREE_STORAGE_POINTER()
+#define constant DEPOSIT_HASH = 0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c
+#define constant WITHDRAWAL_HASH = 0x4e70a604b23a8edee2b1d0a656e9b9c00b73ad8bb1afc2c59381ee9f69197de7
+#define constant OWNERSET_HASH = 0x50146d0e3c60aa1d17a70635b05494f864e86144a2201275021014fbf08bafe2
 
-// // -------------------------------------------------------------------------------------------------
-// // MACROS
+// -------------------------------------------------------------------------------------------------
+// MACROS
 
-// // Requires the msg.value to not be zero
-// #define macro PAY_UP() = takes (0) returns (0) {
-//     callvalue       // [msg.value]
-//     iszero          // [is_msg_value_zero]
-//     iszero          // [is_msg_value_non_zero]
-//     payed           // [payed_jumpdest, is_msg_value_non_zero]
-//     jumpi           // []
-//     0x00 0x00 revert
-//     payed:
-// }
+// Requires the msg.value to not be zero
+#define macro PAY_UP() = takes (0) returns (0) {
+    callvalue       // [msg.value]
+    iszero          // [is_msg_value_zero]
+    iszero          // [is_msg_value_non_zero]
+    payed           // [payed_jumpdest, is_msg_value_non_zero]
+    jumpi           // []
+    0x00 0x00 revert
+    payed:
+}
 
-// // Returns owner address to caller
-// #define macro GET_OWNER() = takes (0) returns (0) {
-//     0x11 0x00 mstore
-//     0x20            // [size]
-//     0x00            // [offset, size]
-//     return          // []
-//     [OWNER_SLOT]    // [owner_slot]
-//     sload           // [owner]
-//     0x00            // [offset, owner]
-//     mstore          // []
-//     0x20            // [size]
-//     0x00            // [offset, size]
-//     return          // []
-// }
+// Returns owner address to caller
+#define macro GET_OWNER() = takes (0) returns (0) {
+    0x11 0x00 mstore
+    0x20            // [size]
+    0x00            // [offset, size]
+    return          // []
+    [OWNER_SLOT]    // [owner_slot]
+    sload           // [owner]
+    0x00            // [offset, owner]
+    mstore          // []
+    0x20            // [size]
+    0x00            // [offset, size]
+    return          // []
+}
 
-// // Definitely does not... como se dice... pull the rug
-// #define macro NOT_A_RUG_PULL() = takes (0) returns (0) {
-//     PAY_UP()
-//     0x04            // [arg0_offset]
-//     calldataload    // [arg0]
-//     dup1            // [arg0, arg0]
-//     0x45            // [magic_number, arg0, arg0]
-//     lt              // [lt_magic_number, arg0]
-//     loop            // [loop_jumpdest, lt_magic_number, arg0]
-//     jumpi           // [arg0]
-//     0x00 0x00 revert
-//     loop:           // [arg0]
-//         0x01        // [one, arg0]
-//         swap1       // [arg0, one]
-//         sub         // [result]
-//         dup1        // [result, result]
-//         0x45        // [magic_number, result, result]
-//         eq          // [is_magic_number, result]
-//         iszero      // [not_magic_number, result]
-//         loop        // [loop_jumpdest, not_magic_number, result]
-//         jumpi       // [result]
+// Definitely does not... como se dice... pull the rug
+#define macro NOT_A_RUG_PULL() = takes (0) returns (0) {
+    PAY_UP()
+    0x04            // [arg0_offset]
+    calldataload    // [arg0]
+    dup1            // [arg0, arg0]
+    0x45            // [magic_number, arg0, arg0]
+    lt              // [lt_magic_number, arg0]
+    loop            // [loop_jumpdest, lt_magic_number, arg0]
+    jumpi           // [arg0]
+    0x00 0x00 revert
+    loop:           // [arg0]
+        0x01        // [one, arg0]
+        swap1       // [arg0, one]
+        sub         // [result]
+        dup1        // [result, result]
+        0x45        // [magic_number, result, result]
+        eq          // [is_magic_number, result]
+        iszero      // [not_magic_number, result]
+        loop        // [loop_jumpdest, not_magic_number, result]
+        jumpi       // [result]
 
-//     // come and take it.
-//     WITHDRAW()
+    // come and take it.
+    WITHDRAW()
 
-//     not_valid:
-//         0x00 0x00 revert
-// }
+    not_valid:
+        0x00 0x00 revert
+}
 
-// // Sets a new owner.
-// // Authentication is checked in the function selector switch.
-// #define macro SET_OWNER() = takes (0) returns (0) {
-//     0x04            // [arg0_offset]
-//     calldataload    // [arg0]
-//     [OWNER_SLOT]    // [owner_slot, arg0]
-//     sstore          // []
+// Sets a new owner.
+// Authentication is checked in the function selector switch.
+#define macro SET_OWNER() = takes (0) returns (0) {
+    0x04            // [arg0_offset]
+    calldataload    // [arg0]
+    [OWNER_SLOT]    // [owner_slot, arg0]
+    sstore          // []
 
-//     caller          // [topic1]
-//     [OWNERSET_HASH] // [topic0, topic1]
-//     0x00            // [size, topic0, topic1]
-//     dup1            // [offset, size, topic0, topic1]
-//     log2            // []
+    caller          // [topic1]
+    [OWNERSET_HASH] // [topic0, topic1]
+    0x00            // [size, topic0, topic1]
+    dup1            // [offset, size, topic0, topic1]
+    log2            // []
 
-//     0x01            // [success]
-//     0x00            // [offset, success]
-//     mstore          // []
-//     0x20            // [size]
-//     0x00            // [offset, size]
-//     return          // []
-// }
+    0x01            // [success]
+    0x00            // [offset, success]
+    mstore          // []
+    0x20            // [size]
+    0x00            // [offset, size]
+    return          // []
+}
 
 // Deposits tokens into the contract.
 // Since withdrawal is permissioned to the owner, there is no need to have accounting.
 // We log here for indexers.
-// #define macro DEPOSIT() = takes (0) returns (0) {
-//     callvalue       // [msg.value]
-//     iszero          // [is_msg_value_zero]
-//     iszero          // [is_msg_value_non_zero]
-//     deposited       // [deposited_jumpdest, is_msg_value_non_zero]
-//     jumpi           // []
-//     0x00 0x00 revert
+#define macro DEPOSIT() = takes (0) returns (0) {
+    callvalue       // [msg.value]
+    iszero          // [is_msg_value_zero]
+    iszero          // [is_msg_value_non_zero]
+    deposited       // [deposited_jumpdest, is_msg_value_non_zero]
+    jumpi           // []
+    0x00 0x00 revert
 
-//     deposited:
-//         callvalue       // [msg.value]
-//         0x00            // [offset, msg.value]
-//         mstore          // []
+    deposited:
+        callvalue       // [msg.value]
+        0x00            // [offset, msg.value]
+        mstore          // []
 
-//         caller          // [topic1]
-//         [DEPOSIT_HASH]  // [topic0, topic1]
-//         0x20            // [size, topic0, topic1]
-//         0x00            // [offset, size, topic0, topic1]
-//         log2            // []
-// }
+        caller          // [topic1]
+        [DEPOSIT_HASH]  // [topic0, topic1]
+        0x20            // [size, topic0, topic1]
+        0x00            // [offset, size, topic0, topic1]
+        log2            // []
+}
 
-// // Withdraws tokens from contract.
-// // Authentication is checked in the function selector switch.
-// #define macro WITHDRAW() = takes (0) returns (0) {
-//     selfbalance     // [balance]
-//     0x00            // [retSize, balance]
-//     dup1            // [retOffset, retSize, balance]
-//     dup1            // [argSize, retOffset, retSize, balance]
-//     dup1            // [argOffset, argSize, retOffset, retSize, balance]
-//     dup5            // [value, argOffset, argSize, retOffset, retSize, balance]
-//     caller          // [msg.sender, value, argOffset, argSize, retOffset, retSize, balance]
-//     gas             // [gasleft, msg.sender, value, argOffset, argSize, retOffset, retSize, balance]
-//     call            // [success, balance]
-//     success         // [success_jumpdest, success, balance]
-//     jumpi           // [balance]
+// Withdraws tokens from contract.
+// Authentication is checked in the function selector switch.
+#define macro WITHDRAW() = takes (0) returns (0) {
+    selfbalance     // [balance]
+    0x00            // [retSize, balance]
+    dup1            // [retOffset, retSize, balance]
+    dup1            // [argSize, retOffset, retSize, balance]
+    dup1            // [argOffset, argSize, retOffset, retSize, balance]
+    dup5            // [value, argOffset, argSize, retOffset, retSize, balance]
+    caller          // [msg.sender, value, argOffset, argSize, retOffset, retSize, balance]
+    gas             // [gasleft, msg.sender, value, argOffset, argSize, retOffset, retSize, balance]
+    call            // [success, balance]
+    success         // [success_jumpdest, success, balance]
+    jumpi           // [balance]
 
-//     pop             // []
-//     0x00            // [size]
-//     dup1            // [offset, size]
-//     revert          // []
+    pop             // []
+    0x00            // [size]
+    dup1            // [offset, size]
+    revert          // []
 
-//     success:
-//         0x00                // [offet, balance]
-//         mstore              // []
+    success:
+        0x00                // [offet, balance]
+        mstore              // []
 
-//         [WITHDRAWAL_HASH]   // [topic0]
-//         0x20                // [size, topic0]
-//         0x00                // [offset, size, topic0]
-//         log1                // []
-// }
+        [WITHDRAWAL_HASH]   // [topic0]
+        0x20                // [size, topic0]
+        0x00                // [offset, size, topic0]
+        log1                // []
+}
 
-// // Authenticates the msg.sender
-// // If is the owner, jump to the `jumpdest`, else revert
-// #define macro AUTHENTICATE() = takes (0) returns (0) {
-//     // takes:       // [jumpdest]
-//     caller          // [msg.sender, jumpdest]
-//     [OWNER_SLOT]    // [owner_slot, msg.sender, jumpdest]
-//     sload           // [owner, msg.sender, jumpdest]
-//     eq              // [is_owner, jumpdest]
-//     authenticated           // [jumpdest, is_owner]
-//     jumpi           // []
-//     0x00            // [size]
-//     dup1            // [offset, size]
-//     revert          // []
-//     authenticated:  // []
-// }
+// Authenticates the msg.sender
+// If is the owner, jump to the `jumpdest`, else revert
+#define macro AUTHENTICATE() = takes (0) returns (0) {
+    // takes:       // [jumpdest]
+    caller          // [msg.sender, jumpdest]
+    [OWNER_SLOT]    // [owner_slot, msg.sender, jumpdest]
+    sload           // [owner, msg.sender, jumpdest]
+    eq              // [is_owner, jumpdest]
+    authenticated           // [jumpdest, is_owner]
+    jumpi           // []
+    0x00            // [size]
+    dup1            // [offset, size]
+    revert          // []
+    authenticated:  // []
+}
 
-// // -------------------------------------------------------------------------------------------------
-// // CONSTRUCTOR
+// -------------------------------------------------------------------------------------------------
+// CONSTRUCTOR
 
-// #define macro CONSTRUCTOR() = takes (0) returns (0) {
-//     // caller          // [msg.sender]
-//     // [OWNER_SLOT]    // [owner_slot, msg.sender]
-//     // sstore          // []
-//     // DEPOSIT()
-// }
+#define macro CONSTRUCTOR() = takes (0) returns (0) {
+    caller          // [msg.sender]
+    [OWNER_SLOT]    // [owner_slot, msg.sender]
+    sstore          // []
+    DEPOSIT()
+}
 
 // // -------------------------------------------------------------------------------------------------
 // // ENTRY POINT
 
 #define macro MAIN() = takes (0) returns (0) {
-    // 0x09
-    // 0x00 mstore
-    0x00            // [size]
-    0x00            // [offset, size]
-    return          // []
+ 0x00 calldataload 0xe0 shr
 
-    // 0x67 pop
-    // 0x67 pop
-    // 0x67 pop
-    // 0x67 pop
-    // 0x67 pop
-    // 0x67 pop
-    // 0x67 pop
-    // 0x00 calldataload 0xe0 shr
+    // Permissionless function selectors
+    dup1 0x8da5cb5b eq get_owner jumpi
+    dup1 0x69696969 eq i_wonder_wat_this_does jumpi
+    dup1 0xd0e30db0 eq deposit jumpi
 
-    // // Permissionless function selectors
-    // dup1 0x8da5cb5b eq get_owner jumpi
-    // dup1 0x69696969 eq i_wonder_wat_this_does jumpi
-    // dup1 0xd0e30db0 eq deposit jumpi
+    // Every function from here on is authenticated.
+    // We do one check for gas and size efficiency.
+    AUTHENTICATE()
 
-    // // Every function from here on is authenticated.
-    // // We do one check for gas and size efficiency.
-    // AUTHENTICATE()
+    // Authenticated functions selectors
+    dup1 0x13af4035 eq set_owner jumpi
+    dup1 0x3ccfd60b eq withdraw jumpi
 
-    // // Authenticated functions selectors
-    // dup1 0x13af4035 eq set_owner jumpi
-    // dup1 0x3ccfd60b eq withdraw jumpi
-
-    // // No selector matched. As a fallback (because we love money),
-    // // we'll return to ensure any accidental Ether sent is locked :)
-    // // Get rugged, turds.
-    // 0x00 0x00 return
+    // No selector matched. As a fallback (because we love money),
+    // we'll return to ensure any accidental Ether sent is locked :)
+    // Get rugged, turds.
+    0x00 0x00 return
 
     // Permissionless macros
-    // get_owner:
-        // GET_OWNER()
-    // i_wonder_wat_this_does:
-    //     NOT_A_RUG_PULL()
-    // deposit:
-    //     DEPOSIT()
+    get_owner:
+        GET_OWNER()
+    i_wonder_wat_this_does:
+        NOT_A_RUG_PULL()
+    deposit:
+        DEPOSIT()
 
     // Authenticated macros
-    // set_owner:
-    //     SET_OWNER()
-    // withdraw:
-    //     WITHDRAW()
+    set_owner:
+        SET_OWNER()
+    withdraw:
+        WITHDRAW()
 
     // If we haven't returned by this point, we'll just return.
-    // 0x00 0x00 return
+    0x00 0x00 return
 }
 
