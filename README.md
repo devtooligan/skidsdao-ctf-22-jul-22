@@ -1,56 +1,57 @@
 <img align="right" width="150" height="150" top="100" src="./assets/blueprint.png">
 
-# huff-project-template • [![ci](https://github.com/huff-language/huff-project-template/actions/workflows/ci.yaml/badge.svg)](https://github.com/huff-language/huff-project-template/actions/workflows/ci.yaml) ![license](https://img.shields.io/github/license/huff-language/huff-project-template.svg) ![solidity](https://img.shields.io/badge/solidity-^0.8.15-lightgrey)
+# SkidsDAO ctf
 
-Versatile Huff Project Template using Foundry.
+On 22-July-2022, [@jtriley](https://twitter.com/jtriley_eth) tweeted:
+```
+Vault Deployment:
+https://optimistic.etherscan.io/address/0xc9c1f60862cab3aa8081f9a9a3b929ab5ad3d594
 
+Source Code:
+https://gist.github.com/JoshuaTrujillo15/f6e76cdb6856eb4f12d5d6778a435d1e
+
+The clock is ticking.
+
+Good hacking.
+```
+
+The code for that CTF has been imported here for local testing with Foundry. 
+(There is a hint and a solution available, see below)
 
 ## Getting Started
 
-Click "Use this template" on [GitHub](https://github.com/huff-language/huff-project-template) to create a new repository with this repo as the initial state.
+Git clone this repo and cd into the folder
 
-Once you've cloned and entered into your repository, you need to install the necessary dependencies. In order to do so, simply run:
+```shell
+git clone git@github.com:devtooligan/skidsdao-ctf-22-jul-22.git
 
+cd skidsdao-ctf-22-jul-22.git
+```
+
+Forge install (if you don't have Forge installed see [installation guide](https://book.getfoundry.sh/getting-started/installation))
 ```shell
 forge install
 ```
 
-To build and test your contracts, you can run:
+To run tests:
 
 ```shell
-forge build
 forge test
 ```
 
 For more information on how to use Foundry, check out the [Foundry Github Repository](https://github.com/foundry-rs/foundry/tree/master/forge) and the [foundry-huff library repository](https://github.com/huff-language/foundry-huff).
 
+## Instructions
+Enter your hacking logic into the `testHack()` function in the `test` folder
 
-## Blueprint
+If you would like a hint, checkout the branch `feat/hint`
 
-```ml
-lib
-├─ forge-std — https://github.com/foundry-rs/forge-std
-├─ foundry-huff — https://github.com/huff-language/foundry-huff
-scripts
-├─ Deploy.s.sol — Deployment Script
-src
-├─ SimpleStore — A Simple Storage Contract in Huff
-test
-└─ SimpleStore.t — SimpleStoreTests
+```shell
+git checkout feat/hint
 ```
 
-
-## License
-
-[The Unlicense](https://github.com/huff-language/huff-project-template/blob/master/LICENSE)
-
-
-## Acknowledgements
-
-- [forge-template](https://github.com/foundry-rs/forge-template)
-- [femplate](https://github.com/abigger87/femplate)
-
-
-## Disclaimer
-
-_These smart contracts are being provided as is. No guarantee, representation or warranty is being made, express or implied, as to the safety or correctness of the user interface or the smart contracts. They have not been audited and as such there can be no assurance they will work as intended, and users may experience delays, failures, errors, omissions, loss of transmitted information or loss of funds. The creators are not liable for any of the foregoing. Users should proceed with caution and use at their own risk._
+If you would like the solution:
+```shell
+git checkout feat/solution
+```
+Solution writeup in the comments!
