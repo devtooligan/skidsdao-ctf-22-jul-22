@@ -17,7 +17,6 @@ contract SolutionTest is Test {
 
     function setUp() public {
         vault = Vault(HuffDeployer.config().with_value(111 ether).deploy{value: 111 ether}("Vault"));
-        hackerStartingBal = hackerStartingBal;
         vm.deal(address(vault), 100 ether); // give the vault 100 eth to make it fun
         vm.deal(hacker, 0.2 ether); // give the hacker a little beer money
     }
