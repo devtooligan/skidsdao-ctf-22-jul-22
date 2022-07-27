@@ -2,7 +2,7 @@
 
 # SkidsDAO ctf
 
-On 22-July-2022, [@jtriley](https://twitter.com/jtriley_eth) tweeted:
+On 22-July-2022, [@jtriley](https://gist.github.com/JoshuaTrujillo15) [tweeted](https://twitter.com/jtriley_eth/status/1550459124047138819):
 ```
 Vault Deployment:
 https://optimistic.etherscan.io/address/0xc9c1f60862cab3aa8081f9a9a3b929ab5ad3d594
